@@ -3,5 +3,10 @@ package main
 import "fmt"
 
 func main() {
-	fmt.Println("top")
+
+	projectName := "Better HTTP"
+
+	log := fmt.Sprintf("Running %s...", projectName)
+
+	fmt.Println(log)
 }
