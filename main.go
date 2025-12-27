@@ -11,13 +11,13 @@ func getGreeting() string {
 	var greeting string
 
 	switch {
-	case hour > 0 && hour <= 6:
+	case hour >= 0 && hour < 6:
 		greeting = "Good night!"
-	case hour > 6 && hour <= 12:
+	case hour >= 6 && hour < 12:
 		greeting = "Good morning!"
-	case hour > 12 && hour <= 18:
+	case hour >= 12 && hour < 18:
 		greeting = "Good afternoon!"
-	case hour > 18 && hour <= 23:
+	case hour >= 18 && hour < 23:
 		greeting = "Good evening!"
 	default:
 		greeting = "Hello!"
