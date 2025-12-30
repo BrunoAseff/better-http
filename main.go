@@ -5,9 +5,7 @@ import (
 	"time"
 )
 
-func getGreeting() string {
-	hour := time.Now().Hour()
-
+func getGreetingForHour(hour int) string {
 	var greeting string
 
 	switch {
@@ -17,13 +15,17 @@ func getGreeting() string {
 		greeting = "Good morning!"
 	case hour >= 12 && hour < 18:
 		greeting = "Good afternoon!"
-	case hour >= 18 && hour < 23:
+	case hour >= 18 && hour < 24:
 		greeting = "Good evening!"
 	default:
 		greeting = "Hello!"
 	}
 
 	return greeting
+}
+
+func getGreeting() string {
+	return getGreetingForHour(time.Now().Hour())
 }
 
 func main() {
