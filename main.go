@@ -37,8 +37,6 @@ func getLinesChannel(file io.ReadCloser) <-chan string {
 
 			defer close(ch)
 
-			defer file.Close()
-
 			for i := 0; i < len(buf); i += 8 {
 				lo := i
 				hi := i + 8
