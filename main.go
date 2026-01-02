@@ -26,6 +26,8 @@ func main() {
 
 	if len(buf) > 0 {
 
+		str := ""
+
 		for i := 0; len(buf) > i; i += 8 {
 
 			if i > len(buf) {
@@ -39,7 +41,22 @@ func main() {
 				hi = len(buf)
 			}
 
-			fmt.Printf("read: %v\n", string(buf[lo:hi]))
+			for j := 0; j < hi-lo; j++ {
+
+				b := buf[j+lo]
+
+				if string(b) == "\n" {
+					str += string(buf[lo : j+lo])
+
+					fmt.Printf("read: %v\n", str)
+
+					str = string(buf[j:hi])
+
+					continue
+				}
+
+				str += string(b)
+			}
 
 		}
 	}
