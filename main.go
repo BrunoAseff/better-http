@@ -10,13 +10,13 @@ func main() {
 
 	const PORT = ":42069"
 
-	listener, err := net.Listen("tcp4", PORT)
+	listener, err := net.Listen("tcp", PORT)
 
 	if err != nil {
 		fmt.Println("Could not create connection", err)
 	}
 
-	defer closeConnection(listener)
+	defer listener.Close()
 
 	for {
 		conn, err := listener.Accept()
@@ -34,6 +34,8 @@ func main() {
 			for str := range ch {
 				fmt.Printf("read: %v\n", str)
 			}
+
+			fmt.Println("The connection has been closed")
 		}
 	}
 
@@ -84,18 +86,4 @@ func getLinesChannel(file io.ReadCloser) <-chan string {
 	}
 
 	return ch
-}
-
-func closeConnection(net net.Listener) {
-
-	err := net.Close()
-
-	if err == nil {
-		fmt.Println("The connection has been closed")
-
-		return
-	}
-
-	fmt.Println("The connection was not closed")
-
 }
