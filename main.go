@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"io"
 	"net"
-	"os"
 )
 
 func closeConnection(net net.Listener) {
@@ -93,14 +92,7 @@ func main() {
 		if conn != nil {
 			fmt.Println("The connection has been accepted")
 
-			file, err := os.Open("messages.txt")
-
-			if err != nil {
-				fmt.Println("File could not be opened", err)
-				return
-			}
-
-			ch := getLinesChannel(file)
+			ch := getLinesChannel(conn)
 
 			for str := range ch {
 				fmt.Printf("read: %v\n", str)
