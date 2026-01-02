@@ -12,38 +12,32 @@ func main() {
 
 	if err != nil {
 		fmt.Println("File could not be opened")
+		return
 	}
 
 	defer file.Close()
 
-	buf := make([]byte, 1024)
-	var num int
+	buf, err := io.ReadAll(file)
 
-	for {
-		n, err := file.Read(buf)
-
-		num += n
-
-		if err == io.EOF {
-			break
-		}
-
-		if err != nil {
-			fmt.Println("Error reading the file")
-			break
-		}
+	if err != nil {
+		fmt.Println("Error reading file:", err)
+		return
 	}
 
 	if len(buf) > 0 {
 
 		for i := 0; len(buf) > i; i += 8 {
 
-			if i > num {
+			if i > len(buf) {
 				break
 			}
 
 			lo := i
 			hi := i + 8
+
+			if hi > len(buf) {
+				hi = len(buf)
+			}
 
 			fmt.Printf("read: %v\n", string(buf[lo:hi]))
 
