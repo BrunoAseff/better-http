@@ -20,6 +20,11 @@ func getLinesChannel(file io.ReadCloser) <-chan string {
 		bytesToAdd := []byte{}
 
 		go func() {
+
+			defer close(ch)
+
+			defer file.Close()
+
 			for i := 0; i < len(buf); i += 8 {
 				lo := i
 				hi := i + 8
@@ -44,8 +49,6 @@ func getLinesChannel(file io.ReadCloser) <-chan string {
 				}
 
 			}
-
-			defer close(ch)
 		}()
 	}
 
@@ -66,7 +69,5 @@ func main() {
 	for str := range ch {
 		fmt.Printf("read: %v\n", str)
 	}
-
-	defer file.Close()
 
 }
