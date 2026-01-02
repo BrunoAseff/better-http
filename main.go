@@ -6,17 +6,36 @@ import (
 	"net"
 )
 
-func closeConnection(net net.Listener) {
+func main() {
 
-	err := net.Close()
+	const PORT = ":42069"
 
-	if err == nil {
-		fmt.Println("The connection has been closed")
+	net, err := net.Listen("tcp4", PORT)
 
-		return
+	if err != nil {
+		fmt.Println("Could not create connection", err)
 	}
 
-	fmt.Println("The connection was not closed")
+	defer closeConnection(net)
+
+	for {
+		conn, err := net.Accept()
+
+		if err != nil {
+			fmt.Println("The connection failed", err)
+			return
+		}
+
+		if conn != nil {
+			fmt.Println("The connection has been accepted")
+
+			ch := getLinesChannel(conn)
+
+			for str := range ch {
+				fmt.Printf("read: %v\n", str)
+			}
+		}
+	}
 
 }
 
@@ -67,35 +86,16 @@ func getLinesChannel(file io.ReadCloser) <-chan string {
 	return ch
 }
 
-func main() {
+func closeConnection(net net.Listener) {
 
-	const PORT = ":42069"
+	err := net.Close()
 
-	net, err := net.Listen("tcp4", PORT)
+	if err == nil {
+		fmt.Println("The connection has been closed")
 
-	if err != nil {
-		fmt.Println("Could not create connection", err)
+		return
 	}
 
-	defer closeConnection(net)
-
-	for {
-		conn, err := net.Accept()
-
-		if err != nil {
-			fmt.Println("The connection failed", err)
-			return
-		}
-
-		if conn != nil {
-			fmt.Println("The connection has been accepted")
-
-			ch := getLinesChannel(conn)
-
-			for str := range ch {
-				fmt.Printf("read: %v\n", str)
-			}
-		}
-	}
+	fmt.Println("The connection was not closed")
 
 }
