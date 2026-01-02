@@ -28,12 +28,7 @@ func main() {
 
 		bytesToAdd := []byte{}
 
-		for i := 0; len(buf) > i; i += 8 {
-
-			if i > len(buf) {
-				break
-			}
-
+		for i := 0; i < len(buf); i += 8 {
 			lo := i
 			hi := i + 8
 
