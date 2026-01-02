@@ -27,6 +27,7 @@ func main() {
 	if len(buf) > 0 {
 
 		str := ""
+		bytesToAdd := []byte{}
 
 		for i := 0; len(buf) > i; i += 8 {
 
@@ -41,21 +42,21 @@ func main() {
 				hi = len(buf)
 			}
 
-			for j := 0; j < hi-lo; j++ {
+			chars := buf[lo:hi]
 
-				b := buf[j+lo]
+			for _, char := range chars {
 
-				if string(b) == "\n" {
-					str += string(buf[lo : j+lo])
-
+				if string(char) == "\n" {
+					str += string(bytesToAdd)
 					fmt.Printf("read: %v\n", str)
 
-					str = string(buf[j:hi])
+					bytesToAdd = []byte{}
+					str = ""
 
 					continue
 				}
 
-				str += string(b)
+				bytesToAdd = append(bytesToAdd, char)
 			}
 
 		}
