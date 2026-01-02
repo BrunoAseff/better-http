@@ -10,16 +10,16 @@ func main() {
 
 	const PORT = ":42069"
 
-	net, err := net.Listen("tcp4", PORT)
+	listener, err := net.Listen("tcp4", PORT)
 
 	if err != nil {
 		fmt.Println("Could not create connection", err)
 	}
 
-	defer closeConnection(net)
+	defer closeConnection(listener)
 
 	for {
-		conn, err := net.Accept()
+		conn, err := listener.Accept()
 
 		if err != nil {
 			fmt.Println("The connection failed", err)
