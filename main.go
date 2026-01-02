@@ -26,7 +26,6 @@ func main() {
 
 	if len(buf) > 0 {
 
-		str := ""
 		bytesToAdd := []byte{}
 
 		for i := 0; len(buf) > i; i += 8 {
@@ -47,11 +46,9 @@ func main() {
 			for _, char := range chars {
 
 				if string(char) == "\n" {
-					str += string(bytesToAdd)
-					fmt.Printf("read: %v\n", str)
+					fmt.Printf("read: %v\n", string(bytesToAdd))
 
 					bytesToAdd = []byte{}
-					str = ""
 
 					continue
 				}
