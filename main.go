@@ -2,39 +2,45 @@ package main
 
 import (
 	"fmt"
-	"time"
+	"io"
+	"os"
 )
-
-func getGreetingForHour(hour int) string {
-	var greeting string
-
-	switch {
-	case hour >= 0 && hour < 6:
-		greeting = "Good night!"
-	case hour >= 6 && hour < 12:
-		greeting = "Good morning!"
-	case hour >= 12 && hour < 18:
-		greeting = "Good afternoon!"
-	case hour >= 18 && hour < 24:
-		greeting = "Good evening!"
-	default:
-		greeting = "Hello!"
-	}
-
-	return greeting
-}
-
-func getGreeting() string {
-	return getGreetingForHour(time.Now().Hour())
-}
 
 func main() {
 
-	projectName := "Better HTTP"
+	file, err := os.Open("messages.txt")
 
-	greeting := getGreeting()
+	if err != nil {
+		fmt.Println("File could not be opened")
+		return
+	}
 
-	log := fmt.Sprintf("%s Running %s...", greeting, projectName)
+	defer file.Close()
 
-	fmt.Println(log)
+	buf, err := io.ReadAll(file)
+
+	if err != nil {
+		fmt.Println("Error reading file:", err)
+		return
+	}
+
+	if len(buf) > 0 {
+
+		for i := 0; len(buf) > i; i += 8 {
+
+			if i > len(buf) {
+				break
+			}
+
+			lo := i
+			hi := i + 8
+
+			if hi > len(buf) {
+				hi = len(buf)
+			}
+
+			fmt.Printf("read: %v\n", string(buf[lo:hi]))
+
+		}
+	}
 }
