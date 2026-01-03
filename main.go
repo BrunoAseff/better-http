@@ -44,21 +44,22 @@ func main() {
 }
 
 func getLinesChannel(f io.ReadCloser) <-chan string {
+
 	lines := make(chan string)
 
 	go func() {
-
 		defer f.Close()
 		defer close(lines)
 
 		currentLineContents := ""
 
 		for {
+
 			b := make([]byte, 8, 8)
+
 			n, err := f.Read(b)
 
 			if err != nil {
-
 				if currentLineContents != "" {
 					lines <- currentLineContents
 				}
@@ -77,8 +78,11 @@ func getLinesChannel(f io.ReadCloser) <-chan string {
 				lines <- fmt.Sprintf("%s%s", currentLineContents, parts[i])
 				currentLineContents = ""
 			}
+
 			currentLineContents += parts[len(parts)-1]
+
 		}
 	}()
+
 	return lines
 }
