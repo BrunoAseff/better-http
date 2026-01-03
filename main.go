@@ -3,44 +3,87 @@ package main
 import (
 	"fmt"
 	"io"
-	"os"
+	"net"
 )
 
 func main() {
 
-	file, err := os.Open("messages.txt")
+	const PORT = ":42069"
+
+	listener, err := net.Listen("tcp", PORT)
 
 	if err != nil {
-		fmt.Println("File could not be opened")
-		return
+		fmt.Println("Could not create connection", err)
 	}
 
-	defer file.Close()
+	defer listener.Close()
 
+	for {
+		conn, err := listener.Accept()
+
+		if err != nil {
+			fmt.Println("The connection failed", err)
+			return
+		}
+
+		if conn != nil {
+			fmt.Println("The connection has been accepted")
+
+			ch := getLinesChannel(conn)
+
+			for str := range ch {
+				fmt.Printf("read: %v\n", str)
+			}
+
+			fmt.Println("The connection has been closed")
+		}
+	}
+
+}
+
+func getLinesChannel(file io.ReadCloser) <-chan string {
 	buf, err := io.ReadAll(file)
+	ch := make(chan string)
 
 	if err != nil {
 		fmt.Println("Error reading file:", err)
-		return
+		return nil
 	}
 
 	if len(buf) > 0 {
 
-		for i := 0; len(buf) > i; i += 8 {
+		bytesToAdd := []byte{}
 
-			if i > len(buf) {
-				break
+		go func() {
+
+			defer close(ch)
+
+			for i := 0; i < len(buf); i += 8 {
+				lo := i
+				hi := i + 8
+
+				if hi > len(buf) {
+					hi = len(buf)
+				}
+
+				chars := buf[lo:hi]
+
+				for _, char := range chars {
+
+					if string(char) == "\n" {
+						ch <- string(bytesToAdd)
+
+						bytesToAdd = []byte{}
+
+						continue
+					}
+
+					bytesToAdd = append(bytesToAdd, char)
+				}
+
 			}
-
-			lo := i
-			hi := i + 8
-
-			if hi > len(buf) {
-				hi = len(buf)
-			}
-
-			fmt.Printf("read: %v\n", string(buf[lo:hi]))
-
-		}
+		}()
 	}
+
+	return ch
 }
