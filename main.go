@@ -1,9 +1,11 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"io"
 	"net"
+	"strings"
 )
 
 func main() {
@@ -32,7 +34,7 @@ func main() {
 			ch := getLinesChannel(conn)
 
 			for str := range ch {
-				fmt.Printf("read: %v\n", str)
+				fmt.Printf("read: %v", str)
 			}
 
 			fmt.Println("The connection has been closed")
@@ -41,49 +43,42 @@ func main() {
 
 }
 
-func getLinesChannel(file io.ReadCloser) <-chan string {
-	buf, err := io.ReadAll(file)
-	ch := make(chan string)
+func getLinesChannel(f io.ReadCloser) <-chan string {
+	lines := make(chan string)
 
-	if err != nil {
-		fmt.Println("Error reading file:", err)
-		return nil
-	}
+	go func() {
 
-	if len(buf) > 0 {
+		defer f.Close()
+		defer close(lines)
 
-		bytesToAdd := []byte{}
+		currentLineContents := ""
 
-		go func() {
+		for {
+			b := make([]byte, 8, 8)
+			n, err := f.Read(b)
 
-			defer close(ch)
+			if err != nil {
 
-			for i := 0; i < len(buf); i += 8 {
-				lo := i
-				hi := i + 8
-
-				if hi > len(buf) {
-					hi = len(buf)
+				if currentLineContents != "" {
+					lines <- currentLineContents
 				}
-
-				chars := buf[lo:hi]
-
-				for _, char := range chars {
-
-					if string(char) == "\n" {
-						ch <- string(bytesToAdd)
-
-						bytesToAdd = []byte{}
-
-						continue
-					}
-
-					bytesToAdd = append(bytesToAdd, char)
+				if errors.Is(err, io.EOF) {
+					break
 				}
-
+				fmt.Printf("error: %s\n", err.Error())
+				return
 			}
-		}()
-	}
 
-	return ch
+			str := string(b[:n])
+
+			parts := strings.Split(str, "\n")
+
+			for i := 0; i < len(parts)-1; i++ {
+				lines <- fmt.Sprintf("%s%s", currentLineContents, parts[i])
+				currentLineContents = ""
+			}
+			currentLineContents += parts[len(parts)-1]
+		}
+	}()
+	return lines
 }
