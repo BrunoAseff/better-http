@@ -36,12 +36,10 @@ func main() {
 			fmt.Printf("An error occurred while reading the string", err)
 		}
 
-		{
-			_, err := conn.Write([]byte(str))
+		_, err = conn.Write([]byte(str))
 
-			if err != nil {
-				fmt.Printf("An error occurred while writing in the connection", err)
-			}
+		if err != nil {
+			fmt.Printf("An error occurred while writing in the connection", err)
 		}
 
 	}
