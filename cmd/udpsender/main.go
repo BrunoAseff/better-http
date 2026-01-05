@@ -14,7 +14,7 @@ func main() {
 	add, err := net.ResolveUDPAddr(NETWORK, ADDRESS)
 
 	if err != nil {
-		fmt.Printf("Could resolve UDP Addr: %v", err)
+		fmt.Printf("Could not resolve UDP Addr: %v", err)
 	}
 
 	conn, err := net.DialUDP(NETWORK, nil, add)
