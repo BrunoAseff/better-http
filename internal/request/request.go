@@ -51,9 +51,17 @@ func parseRequestLine(line string) (RequestLine, error) {
 		return RequestLine{}, err
 	}
 
+	httpSections := strings.Split(sections[2], "/")
+
+	if len(httpSections) != 2 {
+		err := errors.New("invalid HTTP version")
+
+		return RequestLine{}, err
+	}
+
 	method := sections[0]
 	requestTarget := sections[1]
-	httpVersion := strings.Split(sections[2], "/")[1]
+	httpVersion := httpSections[1]
 
 	if method == "" {
 		err := errors.New("method was not provided in the request line")
