@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"io"
 	"strings"
-	"unicode/utf8"
 )
 
 type Request struct {
@@ -62,10 +61,10 @@ func parseRequestLine(line string) (RequestLine, error) {
 		return RequestLine{}, err
 	}
 
-	if method != strings.ToUpper(method) || !utf8.ValidString(method) {
-		err := errors.New("method is in the incorrect format")
-
-		return RequestLine{}, err
+	for _, c := range method {
+		if c < 'A' || c > 'Z' {
+			return RequestLine{}, fmt.Errorf("invalid method: %s", method)
+		}
 	}
 
 	if httpVersion != "1.1" {
