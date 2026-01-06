@@ -23,7 +23,7 @@ func RequestFromReader(reader io.Reader) (*Request, error) {
 	data, err := io.ReadAll(reader)
 
 	if err != nil {
-		err = errors.New("Error while reading the string")
+		err = errors.New("error while reading the string")
 
 		return nil, err
 	}
@@ -47,7 +47,7 @@ func parseRequestLine(line string) (RequestLine, error) {
 	sections := strings.Split(line, " ")
 
 	if len(sections) != 3 {
-		err := errors.New("The request line is in the incorrect format")
+		err := errors.New("the request line is in the incorrect format")
 
 		return RequestLine{}, err
 	}
@@ -57,20 +57,20 @@ func parseRequestLine(line string) (RequestLine, error) {
 	httpVersion := strings.Split(sections[2], "/")[1]
 
 	if method == "" {
-		err := errors.New("Method was not provided in the request line")
+		err := errors.New("method was not provided in the request line")
 
 		return RequestLine{}, err
 	}
 
 	if method != strings.ToUpper(method) || !utf8.ValidString(method) {
-		err := errors.New("Method is in the incorrect format")
+		err := errors.New("method is in the incorrect format")
 
 		return RequestLine{}, err
 	}
 
 	if httpVersion != "1.1" {
 
-		err := errors.New(fmt.Sprintf("Invalid HTTP version\nExpected: HTTP/1.1\nReceived: %v", httpVersion))
+		err := fmt.Errorf("invalid HTTP version\nExpected: HTTP/1.1\nReceived: %v", httpVersion)
 
 		return RequestLine{}, err
 	}
