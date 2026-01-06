@@ -33,7 +33,7 @@ func RequestFromReader(reader io.Reader) (*Request, error) {
 	requestLine, err := parseRequestLine(str[0])
 
 	if err != nil {
-		return &Request{}, err
+		return nil, err
 	}
 
 	return &Request{
@@ -46,7 +46,7 @@ func parseRequestLine(line string) (RequestLine, error) {
 
 	sections := strings.Split(line, " ")
 
-	if len(sections) < 3 {
+	if len(sections) != 3 {
 		err := errors.New("The request line is in the incorrect format")
 
 		return RequestLine{}, err
