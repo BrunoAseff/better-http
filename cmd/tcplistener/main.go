@@ -15,7 +15,7 @@ func main() {
 	listener, err := net.Listen("tcp", PORT)
 
 	if err != nil {
-		fmt.Println("Could not create connection", err)
+		fmt.Println("Could not create connection\n", err)
 	}
 
 	defer listener.Close()
@@ -24,17 +24,16 @@ func main() {
 		conn, err := listener.Accept()
 
 		if err != nil {
-			fmt.Println("The connection failed", err)
-			return
+			fmt.Println("The connection failed\n", err)
 		}
 
 		if conn != nil {
-			fmt.Println("The connection has been accepted")
+			fmt.Println("The connection has been accepted\n")
 
 			ch := getLinesChannel(conn)
 
 			for str := range ch {
-				fmt.Printf("read: %v", str)
+				fmt.Println(str)
 			}
 
 			fmt.Println("The connection has been closed")
