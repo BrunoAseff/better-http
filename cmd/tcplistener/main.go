@@ -25,7 +25,6 @@ func main() {
 
 		if err != nil {
 			fmt.Println("The connection failed", err)
-			return
 		}
 
 		if conn != nil {
@@ -34,7 +33,7 @@ func main() {
 			ch := getLinesChannel(conn)
 
 			for str := range ch {
-				fmt.Printf("read: %v", str)
+				fmt.Println(str)
 			}
 
 			fmt.Println("The connection has been closed")
