@@ -41,7 +41,7 @@ func RequestFromReader(reader io.Reader) (*Request, error) {
 
 }
 
-func parseRequestLine(line string) (RequestLine, error) {
+func parseRequestLine(line string) (RequestLine, int, error) {
 
 	sections := strings.Split(line, " ")
 
