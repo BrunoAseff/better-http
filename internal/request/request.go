@@ -15,6 +15,8 @@ const (
 	done
 )
 
+const BUFFER_SIZE = 8
+
 type Request struct {
 	RequestLine RequestLine
 	state       parserState
@@ -53,24 +55,50 @@ func (r *Request) parse(data []byte) (int, error) {
 
 func RequestFromReader(reader io.Reader) (*Request, error) {
 
-	data, err := io.ReadAll(reader)
-
-	if err != nil {
-		err = errors.New("error while reading the string")
-
-		return nil, err
+	buf := make([]byte, BUFFER_SIZE)
+	readToIndex := 0
+	request := Request{
+		state: initialized,
 	}
 
-	requestLine, _, err := parseRequestLine(data)
+	for {
+		if readToIndex == len(buf) {
+			extendedBuf := make([]byte, len(buf)*2)
 
-	if err != nil {
-		return nil, err
+			copy(extendedBuf, buf)
+
+			buf = extendedBuf
+		}
+
+		bytesRead, err := reader.Read(buf[readToIndex:])
+
+		if err != nil {
+			if err == io.EOF {
+				request.state = done
+				break
+			}
+			return nil, err
+		}
+
+		readToIndex += bytesRead
+
+		consumedBytes, err := request.parse(buf[:readToIndex])
+
+		if err != nil {
+			return nil, err
+		}
+
+		if consumedBytes > 0 {
+			copy(buf, buf[consumedBytes:])
+			readToIndex -= consumedBytes
+
+			if request.state == done {
+				return &request, nil
+			}
+		}
 	}
 
-	return &Request{
-		RequestLine: requestLine,
-	}, nil
-
+	return &request, nil
 }
 
 func parseRequestLine(request []byte) (rl RequestLine, bytesNum int, err error) {
