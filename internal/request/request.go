@@ -26,6 +26,31 @@ type RequestLine struct {
 	Method        string
 }
 
+func (r *Request) parse(data []byte) (int, error) {
+	if r.state == initialized {
+		requestLine, bytesNum, err := parseRequestLine(data)
+
+		if err != nil {
+			return 0, err
+		}
+
+		if bytesNum == 0 {
+			return 0, nil
+		}
+
+		r.RequestLine = requestLine
+		r.state = done
+
+		return bytesNum, nil
+	}
+
+	if r.state == done {
+		return 0, errors.New("error: trying to read data in a done state")
+	}
+
+	return 0, errors.New("error: unknown state")
+}
+
 func RequestFromReader(reader io.Reader) (*Request, error) {
 
 	data, err := io.ReadAll(reader)
@@ -55,10 +80,7 @@ func parseRequestLine(request []byte) (rl RequestLine, bytesNum int, err error) 
 	lines := bytes.Split(request, separator)
 
 	if len(lines) < 2 {
-
-		err := errors.New("The separator was not found")
-
-		return RequestLine{}, 0, err
+		return RequestLine{}, 0, nil
 	}
 
 	requestLine := lines[0]
