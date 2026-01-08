@@ -8,8 +8,16 @@ import (
 	"strings"
 )
 
+type parserState int
+
+const (
+	initialized parserState = iota
+	done
+)
+
 type Request struct {
 	RequestLine RequestLine
+	state       parserState
 }
 
 type RequestLine struct {
