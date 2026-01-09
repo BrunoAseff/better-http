@@ -29,10 +29,10 @@ func main() {
 		if conn != nil {
 			fmt.Println("The connection has been accepted")
 
-			ch, err := request.RequestFromReader(conn)
+			req, err := request.RequestFromReader(conn)
 
 			if err == nil {
-				fmt.Printf("Request line:\n- Method: %v\n- Target: %v\n- Version: %v\n", ch.RequestLine.Method, ch.RequestLine.RequestTarget, ch.RequestLine.HttpVersion)
+				fmt.Printf("Request line:\n- Method: %v\n- Target: %v\n- Version: %v\n", req.RequestLine.Method, req.RequestLine.RequestTarget, req.RequestLine.HttpVersion)
 			}
 
 			fmt.Println("The connection has been closed")
