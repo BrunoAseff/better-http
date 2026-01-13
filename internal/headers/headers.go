@@ -8,9 +8,7 @@ import (
 type Headers map[string]string
 
 func NewHeaders() Headers {
-	headers := Headers{}
-
-	return headers
+	return make(map[string]string)
 }
 
 func (h Headers) Parse(data []byte) (n int, done bool, err error) {
@@ -20,28 +18,32 @@ func (h Headers) Parse(data []byte) (n int, done bool, err error) {
 	if idx == -1 {
 		return 0, false, nil
 	}
-	parts := bytes.Split(data, []byte(":"))
 
-	if len(parts) != 2 {
-
-		err := errors.New("Incorect header format")
-
-		return 0, false, err
+	if idx == 0 {
+		return 2, true, nil
 	}
 
-	key, value := parts[0], parts[1]
+	line := data[:idx]
 
-	lastChar := len(string(key)) - 1
+	colonIdx := bytes.IndexByte(line, ':')
 
-	if string(lastChar) == " " {
-		err := errors.New("Incorect header format")
-
-		return 0, true, err
+	if colonIdx == -1 {
+		return 0, false, errors.New("malformed header: no colon found")
 	}
 
-	h[string(key)] = string(value)
+	keyBytes := line[:colonIdx]
+	valBytes := line[colonIdx+1:]
 
-	n = len(key) + len(value)
+	if len(keyBytes) > 0 && keyBytes[len(keyBytes)-1] == ' ' {
+		return 0, false, errors.New("header field name cannot have trailing whitespace before colon")
+	}
 
-	return n, true, nil
+	key := string(bytes.TrimSpace(keyBytes))
+	val := string(bytes.TrimSpace(valBytes))
+
+	h[key] = val
+
+	n = idx + 2
+
+	return n, false, nil
 }
