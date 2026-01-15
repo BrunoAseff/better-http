@@ -3,6 +3,8 @@ package headers
 import (
 	"bytes"
 	"errors"
+	"strings"
+	"unicode"
 )
 
 type Headers map[string]string
@@ -46,4 +48,17 @@ func (h Headers) Parse(data []byte) (n int, done bool, err error) {
 	n = idx + 2
 
 	return n, false, nil
+}
+
+func isAllowed(s string) bool {
+	return strings.IndexFunc(s, func(r rune) bool {
+		return !isAllowedRune(r)
+	}) == -1
+}
+
+func isAllowedRune(r rune) bool {
+	if unicode.IsLetter(r) || unicode.IsDigit(r) {
+		return true
+	}
+	return strings.ContainsRune("!#$%&'*+-.^_`|~", r)
 }
