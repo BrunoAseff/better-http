@@ -13,7 +13,7 @@ func NewHeaders() Headers {
 	return make(map[string]string)
 }
 
-func (h Headers) Parse(data []byte) (n int, done bool, err error) {
+func (h Headers) Parse(data []byte) (int, bool, error) {
 
 	idx := bytes.Index(data, []byte("\r\n"))
 
@@ -45,7 +45,7 @@ func (h Headers) Parse(data []byte) (n int, done bool, err error) {
 
 	h[key] = val
 
-	n = idx + 2
+	n := idx + 2
 
 	return n, false, nil
 }
