@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"errors"
 	"strings"
-	"unicode"
 )
 
 type Headers map[string]string
@@ -42,11 +41,16 @@ func (h Headers) Parse(data []byte) (int, bool, error) {
 			return 0, false, errors.New("header field name cannot have trailing whitespace before colon")
 		}
 
-		key := string(bytes.TrimSpace(keyBytes))
+		key := strings.ToLower(string(keyBytes))
+
 		val := string(bytes.TrimSpace(valBytes))
 
 		if !isAllowed(key) {
 			return 0, false, errors.New("malformed header: invalid characters in key")
+		}
+
+		if key == "" {
+			return 0, false, errors.New("malformed header: empty key")
 		}
 
 		h[key] = val
@@ -56,13 +60,19 @@ func (h Headers) Parse(data []byte) (int, bool, error) {
 }
 
 func isAllowed(s string) bool {
-	return strings.IndexFunc(s, func(r rune) bool {
-		return !isAllowedRune(r)
-	}) == -1
+	if len(s) == 0 {
+		return false
+	}
+	for _, r := range s {
+		if !isAllowedRune(r) {
+			return false
+		}
+	}
+	return true
 }
 
 func isAllowedRune(r rune) bool {
-	if unicode.IsLetter(r) || unicode.IsDigit(r) {
+	if (r >= 'a' && r <= 'z') || (r >= 'A' && r <= 'Z') || (r >= '0' && r <= '9') {
 		return true
 	}
 	return strings.ContainsRune("!#$%&'*+-.^_`|~", r)
